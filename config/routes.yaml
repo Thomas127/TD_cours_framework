@@ -7,6 +7,20 @@
 # To list all registered routes, run the following command:
 #   bin/console debug:router
 
+client_info:
+  path: /client/info/{nom}
+  controller: App\Controller\ClientController2::info
+  
+client_photo:
+  path: /client/photo/{nom}
+  controller: App\Controller\ClientController2::photo
+
+client_prenom:
+  path: /client/prenom/{parametre}
+  requirements: 
+    url : '[a-z]+(-[a-z]+)*'
+  controller: App\Controller\ClientController2::prenom
+
 controllers:
     resource: ../src/Controller/
     type: attribute
