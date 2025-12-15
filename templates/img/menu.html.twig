@@ -1,0 +1,7 @@
+
+
+{% for image in images %}                          
+<li><a class="dropdown-item" href="{{ path('img_affiche', {'parametre': image}) }}">{{ image }}</a></li>
+{% else %}
+<li><a class="dropdown-item" href="#">{{image}}</a></li>
+{% endfor %}
