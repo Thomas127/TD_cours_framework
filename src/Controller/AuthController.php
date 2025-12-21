@@ -17,10 +17,11 @@ class AuthController extends AbstractController
     public function login(Request $request){
         $builder = $this->createFormBuilder();
         $contrainte = new NotBlank();
+        
         $builder
             ->add('email', TextType::class, ['constraints' => $contrainte])
             ->add('password', PasswordType::class, ['constraints' => $contrainte])
-            ->add('Confirmer_password', PasswordType::class)
+            ->add('Confirmer_password', PasswordType::class, ['constraints' => $contrainte])
             ->add('btsubmit', SubmitType::class);
 
         $form = $builder->getForm();
@@ -28,11 +29,19 @@ class AuthController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()){
-            return $this->render("authok.html.twig", ['data' => $form->getData()]);
+            $data = $form->getData();
+            if ($data['password'] !== $data['Confirmer_password']) {
+                return $this->render("login.html.twig", ['infoForm'=> $infoRendu]);
+            }
+            return $this->render("authok.html.twig", ['email' => $email]);
         }
         else{
             return $this->render("login.html.twig", ['infoForm'=> $infoRendu]);
         }
-
     }
+
+    /*#[Route("/confirmation/{email}", name: "auth_confirmation")]
+    public function confirmation(string $email){
+        return $this->render("authok.html.twig", ['email' => $email]);
+    }*/
 }
