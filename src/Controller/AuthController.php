@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class AuthController extends AbstractController
@@ -28,7 +29,7 @@ class AuthController extends AbstractController
             return $this->render("authok.html.twig", ['data' => $form->getData()]);
         }
         else{
-            return $this->render("login.html.twig", ['infoform'=> $infoRendu]);
+            return $this->render("login.html.twig", ['infoForm'=> $infoRendu]);
         }
 
     }
