@@ -6,8 +6,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class AuthController extends AbstractController
 {
@@ -15,10 +17,10 @@ class AuthController extends AbstractController
     public function login(Request $request){
         $builder = $this->createFormBuilder();
         $contrainte = new NotBlank();
-
-        $builder->add('email', TextType::class, [
-            'constraints' => $contrainte
-        ])
+        $builder
+            ->add('email', TextType::class, ['constraints' => $contrainte])
+            ->add('password', PasswordType::class, ['constraints' => $contrainte])
+            ->add('Confirmer_password', PasswordType::class)
             ->add('btsubmit', SubmitType::class);
 
         $form = $builder->getForm();
