@@ -1,5 +1,29 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-{{ form(infoForm)}}
+    {{ form_start(infoForm) }}
+    
+        {{ form_errors(infoForm) }}
+        
+        <div>
+            {{ form_errors(infoForm.email) }}
+            {{ form_label(infoForm.email) }}
+            {{ form_widget(infoForm.email) }}
+        </div>
+        
+        <div>
+            {{ form_errors(infoForm.password) }}
+            {{ form_label(infoForm.password) }}
+            {{ form_widget(infoForm.password) }}
+        </div>
+        
+        <div>
+            {{ form_errors(infoForm.Confirmer_password) }}
+            {{ form_label(infoForm.Confirmer_password) }}
+            {{ form_widget(infoForm.Confirmer_password) }}
+        </div>
+        
+        {{ form_widget(infoForm.btsubmit) }}
+        
+    {{ form_end(infoForm) }}
 {% endblock %}
