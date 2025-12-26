@@ -33,7 +33,6 @@ class AuthController extends AbstractController
 
     #[Route("/home", name: "home")]
     public function home(SessionInterface $session){
-        // Initialiser la session si ce n'est pas fait
         if (!$session->has('auth')) {
             $session->set('auth', false);
             $session->set('nbr', 0);
@@ -83,12 +82,7 @@ class AuthController extends AbstractController
             if ($password === $dataEntity->getPassword())
             {
                 $session->set('auth', true);
-                $user = array(
-                    'auth' => $session->get('auth', false),
-                    'login' => $session->get('login', ''),
-                    'password'=> $session->get('password', '')
-                );
-                return $this->render("private_auth.html.twig", ['session'=> $user]);
+                return $this->redirectToRoute('home');
             }
             else
             {
@@ -111,6 +105,12 @@ class AuthController extends AbstractController
         $session->set('password', $data->getPassword());
 
         return $this->render("authok.html.twig", ['email' => $data->getEmail()]);
+    }
+
+    #[Route("/logout", name: "auth_logout")]
+    public function logout(SessionInterface $session){
+        $session->set('auth', false);
+        return $this->redirectToRoute('home');
     }
     
 }

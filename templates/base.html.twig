@@ -13,12 +13,22 @@
             <div class="container-fluid">
                 <a class="navbar-brand" href="/home">Nav bar</a>
                 {% block button %}
-                <a href="/login">Se connecter</a>
-                <a href="/sign_up">S'inscrire</a>
+                {% if app.session.get('auth') %}
+                    <h2>{{ app.session.get('login') }}</h2>
+                    <a href="/logout">Se deconnecter</a>
+                {% else %}
+                    <a href="/login">Se connecter</a>
+                    <a href="/sign_up">S'inscrire</a>
+                {% endif %}
                 {% endblock %}
             </div>
         </nav>
         {% block body %}
+        {% if app.session.get('auth') %}
+            <p>Vous êtes connecté</p>
+        {% else %}
+            <p>Vous n'êtes pas connecté</p>
+        {% endif %}
         {% endblock %}
         
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
