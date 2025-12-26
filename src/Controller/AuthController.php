@@ -1,77 +1,116 @@
 <?php
 
 namespace App\Controller;
-session_name("Authentification");
-session_start();
-
-$_SESSION['auth'] = false;
-$_SESSION['nbr'] = 0;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use App\Entity\User;
+use App\Form\Type\SignUpType;
+use App\Form\Type\LoginType;
 
 class AuthController extends AbstractController
-{
-    #[Route("/login", name: "auth_login")]
-    public function login(Request $request){
-        $builder = $this->createFormBuilder();
-        $contrainte = new NotBlank();
+{   
+    
+    public function Verif_connecter(SessionInterface $session){
+        // Initialiser la session si ce n'est pas fait
+        if ($session->has('auth')) {
+            $isconnect = $session->get('auth', false);
 
-        $passwordRegex = new Regex([
-            'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#_-])[A-Za-z\d@$!%*?&#_-]{8,}$/',
-            'message' => 'Password must be compose with at least 8 chars, 1 maj, 1 min, and 1 number et special chars'
-        ]);
-
-        $passwordContrainte = new Callback(function($value, ExecutionContextInterface $context) {
-            $form = $context->getRoot();
-            $password = $form->get('password')->getData();
-                    
-            if ($value !== $password) {
-                $context->buildViolation('Password are incorrect.')
-                        ->addViolation();
-                }
-        });
-
-        $builder
-            ->add('email', TextType::class, ['constraints' => $contrainte])
-            ->add('password', PasswordType::class, ['constraints' => [$contrainte, $passwordRegex]])
-            ->add('Confirmer_password', PasswordType::class, ['constraints' => [$contrainte, $passwordContrainte]])
-            ->add('btsubmit', SubmitType::class);
-
-        $form = $builder->getForm();
+            if ($isconnect){
+                $user = array(
+                    'auth' => $session->get('auth', false),
+                    'login' => $session->get('login', ''),
+                    'password'=> $session->get('password', '')
+                );
+                return $this->render("private_auth.html.twig", ['session'=> $user]);
+            }
+        }
         
+        return $this->render("base.html.twig");
+    }
 
+    #[Route("/home", name: "home")]
+    public function home(SessionInterface $session){
+        // Initialiser la session si ce n'est pas fait
+        if (!$session->has('auth')) {
+            $session->set('auth', false);
+            $session->set('nbr', 0);
+        }
+        
+        return $this->render("base.html.twig");
+    }
+
+    #[Route("/sign_up", name: "auth_sign_in")]
+    public function sign_in(Request $request, SessionInterface $session){
+
+        $dataEntity = new User();
+
+        $form = $this->createForm(SignUpType::class, $dataEntity);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()){
-            $data = $form->getData();
-            if ($data['password'] !== $data['Confirmer_password']) {
+            $dataEntity = $form->getData();
+            if ($dataEntity->getPassword() !== $dataEntity->getConfirmPassword()) {
                 
                 $infoRendu = $form->createView();
-                return $this->render("login.html.twig", ['infoForm'=> $infoRendu]);
+                return $this->render("form.html.twig", ['infoForm'=> $infoRendu]);
             }
-            return $this->forward('App\Controller\AuthController::confirmation', ['data' => $data]);
+            
+            
+            return $this->forward('App\Controller\AuthController::confirmation', ['data' => $dataEntity]);
         }
         else{
             $infoRendu = $form->createView();
-            return $this->render("login.html.twig", ['infoForm'=> $infoRendu]);
+            return $this->render("form.html.twig", ['infoForm'=> $infoRendu]);
         }
     }
 
-    #[Route("/authenficate", name: "auth_confirmation")]
-    public function confirmation(array $data){
-        $_SESSION['auth'] = true;
-        $_SESSION["login"] = $data["email"];
-        $_SESSION["password"] = $data["password"];
+    #[Route("/login", name: "auth_login")]
+    public function login(Request $request, SessionInterface $session){
 
-        return $this->render("authok.html.twig", ['email' => $data["email"]]);
+        $dataEntity = new User();
+        $form = $this->createForm(LoginType::class, $dataEntity);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()){
+            $dataEntity = $form->getData();
+            
+            
+            $login = $session->get('login', '');
+            $password = $session->get('password', '');
+
+            if ($password === $dataEntity->getPassword())
+            {
+                $session->set('auth', true);
+                $user = array(
+                    'auth' => $session->get('auth', false),
+                    'login' => $session->get('login', ''),
+                    'password'=> $session->get('password', '')
+                );
+                return $this->render("private_auth.html.twig", ['session'=> $user]);
+            }
+            else
+            {
+                $this->addFlash('error', 'Email ou mot de passe incorrect');
+                $infoRendu = $form->createView();
+                return $this->render("form.html.twig", ['infoForm'=> $infoRendu]);
+            }
+            
+        }
+        else{
+            $infoRendu = $form->createView();
+            return $this->render("form.html.twig", ['infoForm'=> $infoRendu]);
+        }
     }
+
+    #[Route("/authentificate", name: "auth_confirmation")]
+    public function confirmation(User $data, SessionInterface $session){
+        $session->set('auth', false);
+        $session->set('login', $data->getEmail());
+        $session->set('password', $data->getPassword());
+
+        return $this->render("authok.html.twig", ['email' => $data->getEmail()]);
+    }
+    
 }

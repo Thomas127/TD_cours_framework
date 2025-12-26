@@ -10,6 +10,10 @@
                 <source>Password must be compose with at least 8 chars, 1 maj, 1 min, and 1 number et special chars</source>
                 <target>Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.</target>
             </trans-unit>
+            <trans-unit id="3">
+                <source>Password and Login are incorrect.</source>
+                <target>Le mot de passe et/ou le login sont incorrect.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

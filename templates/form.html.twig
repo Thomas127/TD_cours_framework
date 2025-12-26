@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+{% block stylesheet %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.9.0/dist/css/foundation.min.css" crossorigin="anonymous">
+{% endblock %}
+{% block body %}
+    
+    {# Afficher les messages flash #}
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="callout {{ type == 'error' ? 'alert' : 'success' }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+    
+    {% form_theme infoForm 'foundation_6_layout.html.twig'%}
+    {{ form_start(infoForm) }}
+
+    
+        {% set top_errors = form_errors(infoForm) %}
+        {% for child in infoForm %}
+            {% if child.vars.block_prefixes is defined and 'submit' not in child.vars.block_prefixes and 'button' not in child.vars.block_prefixes %}
+                {% set child_errors = form_errors(child) %}
+                {% if child_errors|trim != '' %}
+                    {% set top_errors = top_errors ~ child_errors %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+
+        {% if top_errors|trim != '' %}
+            <div class="callout alert" role="alert">
+                {{ top_errors|raw }}
+            </div>
+        {% endif %}
+        
+        <div>
+            {{ form_label(infoForm.email) }}
+            {{ form_widget(infoForm.email) }}
+        </div>
+        
+        <div>
+            {{ form_label(infoForm.password) }}
+            {{ form_widget(infoForm.password) }}
+        </div>
+        
+        {% if infoForm.ConfirmPassword is defined %}
+            <div>
+                {{ form_label(infoForm.ConfirmPassword) }}
+                {{ form_widget(infoForm.ConfirmPassword) }}
+            </div>
+        
+        {% endif %}
+        {{ form_widget(infoForm.btsubmit) }}
+
+    {{ form_end(infoForm) }}
+
+    {% block javascript %}
+    <script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.9.0/dist/js/foundation.min.js" crossorigin="anonymous"></script>
+    {% endblock %}
+
+{% endblock %}
+
