@@ -15,6 +15,7 @@
                 {% block button %}
                 {% if app.session.get('auth') %}
                     <h2>{{ app.session.get('login') }}</h2>
+                    <a href="/user/liste">Liste User</a>
                     <a href="/logout">Se deconnecter</a>
                 {% else %}
                     <a href="/login">Se connecter</a>
